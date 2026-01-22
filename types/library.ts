@@ -10,6 +10,7 @@ export interface Library {
   url: string
   lat: number
   lng: number
+  distance?: number
 }
 
 export interface LibraryStatus extends Library {
