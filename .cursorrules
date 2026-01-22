@@ -1,0 +1,863 @@
+# 책크 (Cheok) - 송파구 도서관 통합 검색 서비스
+
+## 프로젝트 개요
+
+**서비스명**: 책크 (송파구 도서관 책크)  
+**목적**: 송파구 내 24개 도서관의 도서 소장 및 대출 가능 여부를 한 번에 검색하는 통합 서비스  
+**배포 환경**: Vercel Serverless  
+**타겟 사용자**: 모든 연령대 (특히 어린이부터 노년층까지)
+
+### 핵심 가치
+- **접근성 우선 (Accessibility First)**: 모든 연령대가 쉽게 사용 가능
+- **편리함**: 여러 도서관을 한 번에 검색
+- **신속함**: 실시간 대출 가능 여부 확인
+- **친근함**: 자연 친화적 디자인 (소나무 모티브, 초록색)
+
+---
+
+## 기술 스택 (2026년 1월 기준)
+
+### 필수 버전
+```json
+{
+  "next": "15.5.9",
+  "react": "19.2.2",
+  "react-dom": "19.2.2",
+  "typescript": "5.7.2",
+  "tailwindcss": "4.1.18",
+  "@tanstack/react-query": "^5.80.2",
+  "cheerio": "^1.1.2",
+  "@upstash/redis": "^1.38.0"
+}
+```
+
+### ⚠️ 보안 필수사항
+- **CVE-2025-55182 (React2Shell)**: React 19.0.1+, 19.1.2+, 19.2.1+ 패치된 버전 필수
+- Next.js 15.0.5+, 15.1.9+, 15.2.6+ 패치된 버전 필수
+- 의존성 감사 도구 정기 실행 (npm audit, Dependabot)
+
+---
+
+## 프로젝트 구조
+
+```
+cheok/
+├── app/                          # Next.js App Router
+│   ├── (main)/                   # 메인 라우트 그룹
+│   │   ├── page.tsx              # 검색 화면 (/)
+│   │   ├── loading.tsx
+│   │   └── results/
+│   │       ├── page.tsx          # 검색 결과 (/results)
+│   │       └── loading.tsx
+│   ├── api/                      # API Routes
+│   │   ├── search/route.ts       # GET /api/search
+│   │   ├── libraries/route.ts    # GET /api/libraries
+│   │   └── health/route.ts
+│   ├── layout.tsx                # 루트 레이아웃
+│   ├── globals.css               # Tailwind CSS
+│   ├── providers.tsx             # React Query Provider
+│   └── error.tsx
+├── components/                   # 재사용 컴포넌트
+│   ├── ui/                       # 기본 UI (button, input, badge, card)
+│   ├── search/                   # 검색 관련
+│   ├── library/                  # 도서관 관련
+│   ├── book/                     # 도서 관련
+│   └── filter/                   # 필터/정렬
+├── lib/                          # 유틸리티 & 서비스
+│   ├── api/                      # API 클라이언트
+│   ├── scraper/                  # 웹 크롤링 (Cheerio)
+│   ├── cache/                    # Redis 캐싱
+│   ├── kakao/                    # 카카오맵 (Phase 3)
+│   ├── hooks/                    # 커스텀 훅
+│   ├── utils/                    # 유틸리티 함수
+│   └── constants/                # 상수 (도서관 목록 등)
+├── types/                        # TypeScript 타입 정의
+│   ├── book.ts
+│   ├── library.ts
+│   └── search.ts
+└── public/                       # 정적 파일
+    └── images/
+```
+
+---
+
+## TypeScript 규칙
+
+### 엄격 모드 필수
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "target": "ES2024"
+  }
+}
+```
+
+### 타입 작성 규칙
+
+**DO ✓**
+```typescript
+// 명시적 반환 타입
+function searchBooks(params: SearchParams): Promise<SearchResponse> {
+  // ...
+}
+
+// unknown 사용 (any 금지)
+function parseData(data: unknown): ParsedData {
+  if (typeof data === 'object' && data !== null) {
+    // type narrowing
+  }
+}
+
+// 인터페이스로 구조 정의
+interface LibraryStatus {
+  libraryId: string
+  libraryName: string
+  libraryType: 'public' | 'smart' | 'education'
+  hasBook: boolean
+  isAvailable: boolean
+  status: string
+  dueDate: string | null
+}
+```
+
+**DON'T ✗**
+```typescript
+// any 사용 금지
+function fetchData(url: any) { }  // ✗
+
+// 암묵적 any
+function handleClick(e) { }  // ✗
+
+// @ts-ignore 사용 금지
+// @ts-ignore  // ✗
+const result = dangerousFunction()
+```
+
+---
+
+## React 19 & Next.js 15 패턴
+
+### Server Components 우선
+
+**기본 원칙**
+- 모든 컴포넌트는 기본적으로 Server Component
+- 인터랙션이 필요할 때만 `'use client'` 사용
+- 데이터 페칭은 Server Component에서
+
+**DO ✓**
+```typescript
+// app/(main)/results/page.tsx - Server Component
+export default async function ResultsPage({ searchParams }) {
+  // 서버에서 데이터 페칭
+  const data = await fetchSearchResults(searchParams)
+  
+  return (
+    <main>
+      <BookInfoCard data={data.book} />
+      {/* 클라이언트 컴포넌트는 필요한 부분만 */}
+      <LibraryListClient libraries={data.libraries} />
+    </main>
+  )
+}
+
+// components/library/library-list-client.tsx
+'use client'
+
+import { useState } from 'react'
+
+export function LibraryListClient({ libraries }) {
+  const [sortBy, setSortBy] = useState('distance')
+  // 클라이언트 상태 및 인터랙션만
+}
+```
+
+### Server Actions
+
+**DO ✓**
+```typescript
+// app/api/search/route.ts
+'use server'
+
+import { z } from 'zod'
+
+const searchSchema = z.object({
+  title: z.string().optional(),
+  author: z.string().optional(),
+  publisher: z.string().optional(),
+})
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url)
+  
+  // 입력 검증 필수 (보안)
+  const params = searchSchema.parse({
+    title: searchParams.get('title'),
+    author: searchParams.get('author'),
+    publisher: searchParams.get('publisher'),
+  })
+  
+  // Rate limiting
+  const ip = request.headers.get('x-forwarded-for') || 'anonymous'
+  const { success } = await ipRateLimit.limit(ip)
+  if (!success) {
+    return NextResponse.json({ error: '요청이 너무 많습니다.' }, { status: 429 })
+  }
+  
+  // 비즈니스 로직
+}
+
+export const maxDuration = 60 // 60초 타임아웃
+```
+
+### React 19 신규 Hooks 활용
+
+**useActionState (폼 처리)**
+```typescript
+'use client'
+
+import { useActionState } from 'react'
+
+export function SearchForm() {
+  const [state, formAction, isPending] = useActionState(searchAction, null)
+  
+  return (
+    <form action={formAction}>
+      <input name="title" placeholder="책 제목" />
+      <button disabled={isPending}>
+        {isPending ? '검색 중...' : '검색하기'}
+      </button>
+    </form>
+  )
+}
+```
+
+**useOptimistic (낙관적 업데이트)**
+```typescript
+'use client'
+
+import { useOptimistic } from 'react'
+
+export function FavoriteButton({ libraryId, isFavorite }) {
+  const [optimisticFavorite, addOptimistic] = useOptimistic(
+    isFavorite,
+    (state) => !state
+  )
+  
+  return (
+    <button onClick={() => addOptimistic()}>
+      {optimisticFavorite ? '★' : '☆'}
+    </button>
+  )
+}
+```
+
+---
+
+## 스타일링 (Tailwind CSS 4)
+
+### 디자인 토큰 (CSS Variables)
+
+```css
+/* app/globals.css */
+@layer theme {
+  :root {
+    /* Primary Green (소나무 초록) */
+    --color-primary: #2D7A4E;
+    --color-primary-light: #4CAF6F;
+    --color-primary-lighter: #E8F5E9;
+    --color-primary-dark: #1B5E3A;
+    
+    /* Status Colors */
+    --color-available-bg: #DCFCE7;
+    --color-available-text: #15803D;
+    --color-on-loan-bg: #FEE2E2;
+    --color-on-loan-text: #B91C1C;
+    
+    /* Spacing (8px 기반) */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+    
+    /* Typography */
+    --font-size-h1: 28px;
+    --font-size-body: 16px;
+    --line-height-relaxed: 1.6;
+  }
+}
+```
+
+### 컴포넌트 스타일링 규칙
+
+**DO ✓**
+```typescript
+// Tailwind 유틸리티 클래스 사용
+<button className="bg-primary text-white px-8 py-4 rounded-md font-semibold hover:bg-primary-dark transition-all">
+  검색하기
+</button>
+
+// 재사용 컴포넌트에서 cn() 유틸 활용
+import { cn } from '@/lib/utils/cn'
+
+export function Button({ className, variant = 'primary', ...props }) {
+  return (
+    <button
+      className={cn(
+        'px-8 py-4 rounded-md font-semibold transition-all',
+        variant === 'primary' && 'bg-primary text-white hover:bg-primary-dark',
+        variant === 'secondary' && 'bg-transparent border border-gray-300',
+        className
+      )}
+      {...props}
+    />
+  )
+}
+```
+
+**DON'T ✗**
+```typescript
+// arbitrary values 남발 금지
+<div className="mt-[17px] p-[23px]" /> // ✗
+
+// 인라인 스타일 지양
+<div style={{ marginTop: '17px' }} /> // ✗
+
+// 테마 토큰 무시 금지
+<div className="bg-[#FF0000]" /> // ✗ 대신 정의된 색상 사용
+```
+
+### 반응형 디자인 (모바일 우선)
+
+```typescript
+// 모바일 → 태블릿 → 데스크톱 순서
+<div className="
+  p-4                    // 모바일 (기본)
+  md:p-6                 // 태블릿 (768px+)
+  lg:p-8                 // 데스크톱 (1024px+)
+  max-w-screen-xl mx-auto
+">
+```
+
+---
+
+## 접근성 (WCAG 2.1 AA 준수)
+
+### 필수 규칙
+
+1. **색상 대비**
+   - 텍스트: 최소 4.5:1
+   - 큰 텍스트 (18px+): 최소 3:1
+   - UI 컴포넌트: 최소 3:1
+
+2. **색상에만 의존하지 않기**
+```typescript
+// DO ✓ - 색상 + 아이콘 + 텍스트
+<span className="badge-available">
+  <CheckIcon />
+  대출가능
+</span>
+
+// DON'T ✗ - 색상만으로 정보 전달
+<span className="bg-green-500" /> // 무엇을 의미하는지 불명확
+```
+
+3. **시맨틱 HTML**
+```typescript
+// DO ✓
+<header>
+  <h1>책크</h1>
+</header>
+<main>
+  <section aria-label="도서 검색">
+    <h2>검색</h2>
+  </section>
+</main>
+
+// DON'T ✗
+<div className="header">
+  <div className="title">책크</div>
+</div>
+```
+
+4. **키보드 접근성**
+   - 모든 인터랙티브 요소는 Tab으로 접근 가능
+   - 포커스 표시 명확히 (outline 제거 금지)
+   - Enter로 버튼 실행, Esc로 모달 닫기
+
+5. **터치 타겟**
+   - 최소 44x44px (모바일)
+   - 터치 요소 간 최소 8px 간격
+
+6. **ARIA 레이블**
+```typescript
+<button aria-label="도서 검색 실행">
+  🔍 검색하기
+</button>
+
+<div role="status" aria-live="polite">
+  검색 결과 12개를 찾았습니다
+</div>
+
+<img src="cover.jpg" alt="멋진 신세계 표지" />
+```
+
+7. **노년층 배려**
+   - 최소 폰트 크기: 16px
+   - 행간: 1.5-1.6
+   - 명확한 레이블
+   - 간단한 인터랙션
+
+---
+
+## 성능 최적화
+
+### 이미지 최적화
+
+```typescript
+// DO ✓ - next/image 사용
+import Image from 'next/image'
+
+<Image
+  src="/images/book-cover.jpg"
+  alt="도서 표지"
+  width={120}
+  height={168}
+  loading="lazy"
+  placeholder="blur"
+/>
+
+// DON'T ✗ - img 태그 직접 사용
+<img src="/images/book-cover.jpg" /> // ✗
+```
+
+### 코드 스플리팅
+
+```typescript
+// 동적 import로 번들 크기 감소
+import dynamic from 'next/dynamic'
+
+const KakaoMap = dynamic(
+  () => import('@/components/map/kakao-map'),
+  {
+    loading: () => <div>지도 로딩 중...</div>,
+    ssr: false, // 클라이언트에서만 렌더링
+  }
+)
+```
+
+### 캐싱 전략
+
+```typescript
+// lib/cache/redis.ts
+import { Redis } from '@upstash/redis'
+
+export const redis = Redis.fromEnv()
+
+export const CACHE_TTL = {
+  SEARCH_RESULT: 5 * 60,        // 5분 (실시간성 유지)
+  LIBRARY_LIST: 24 * 60 * 60,   // 24시간
+  BOOK_INFO: 7 * 24 * 60 * 60,  // 7일
+}
+
+// 캐시 키 패턴
+export function getCacheKey(type: string, ...params: string[]): string {
+  return `${type}:${params.join(':')}`
+}
+```
+
+### Streaming SSR
+
+```typescript
+// app/(main)/results/loading.tsx
+export default function Loading() {
+  return (
+    <div className="space-y-4">
+      {/* 스켈레톤 UI */}
+      <div className="animate-pulse h-40 bg-gray-200 rounded-lg" />
+    </div>
+  )
+}
+```
+
+---
+
+## 웹 크롤링 (Cheerio)
+
+### 기본 원칙
+- **Cheerio 사용**: Puppeteer 대신 (50배 이상 빠름, 메모리 효율적)
+- **Rate Limiting**: 도서관 서버 부하 최소화
+- **에러 핸들링**: 재시도 로직 필수
+- **타임아웃**: 10초 제한
+
+### 크롤링 구현
+
+```typescript
+// lib/scraper/songpa-unified.ts
+import * as cheerio from 'cheerio'
+
+export async function scrapeSongpaUnified(params: SearchParams) {
+  const { title, author, publisher } = params
+  
+  // URL 생성
+  const searchUrl = new URL('https://www.splibrary.or.kr/search/searchResult.do')
+  if (title) searchUrl.searchParams.set('q', title)
+  
+  // Fetch with retry
+  const response = await fetchWithRetry(searchUrl.toString(), {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (compatible; CheokBot/1.0)',
+    },
+  })
+  
+  const html = await response.text()
+  const $ = cheerio.load(html)
+  
+  // 도서 정보 추출
+  const bookInfo = {
+    title: $('.book-title').first().text().trim(),
+    author: $('.book-author').first().text().trim(),
+    // ...
+  }
+  
+  // 도서관별 소장 정보
+  const libraries: LibraryStatus[] = []
+  $('.library-status-row').each((i, el) => {
+    const $row = $(el)
+    libraries.push({
+      libraryId: $row.data('library-id'),
+      libraryName: $row.find('.library-name').text().trim(),
+      hasBook: $row.find('.has-book').length > 0,
+      isAvailable: $row.find('.status-available').length > 0,
+      // ...
+    })
+  })
+  
+  return { book: bookInfo, libraries }
+}
+
+// 재시도 로직
+async function fetchWithRetry(url: string, options = {}, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: AbortSignal.timeout(10000), // 10초
+      })
+      if (response.ok) return response
+      
+      // 429 Too Many Requests - 백오프
+      if (response.status === 429) {
+        const delay = Math.pow(2, i) * 1000
+        await new Promise(resolve => setTimeout(resolve, delay))
+        continue
+      }
+    } catch (error) {
+      if (i === maxRetries - 1) throw error
+      await new Promise(resolve => setTimeout(resolve, 1000))
+    }
+  }
+  throw new Error('Max retries exceeded')
+}
+```
+
+---
+
+## 보안
+
+### 환경 변수
+
+```bash
+# .env.example
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+NEXT_PUBLIC_KAKAO_MAP_KEY=
+NODE_ENV=development
+```
+
+```typescript
+// lib/env.ts - 환경 변수 검증
+import { z } from 'zod'
+
+const envSchema = z.object({
+  UPSTASH_REDIS_REST_URL: z.string().url(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
+  NODE_ENV: z.enum(['development', 'production', 'test']),
+})
+
+export const env = envSchema.parse(process.env)
+```
+
+### Rate Limiting
+
+```typescript
+// lib/rate-limit.ts
+import { Ratelimit } from '@upstash/ratelimit'
+import { redis } from './cache/redis'
+
+export const ipRateLimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(10, '1 m'), // 1분에 10회
+  analytics: true,
+})
+```
+
+### Input Sanitization
+
+```typescript
+// lib/utils/validation.ts
+import DOMPurify from 'isomorphic-dompurify'
+
+export function sanitizeInput(input: string): string {
+  return DOMPurify.sanitize(input, {
+    ALLOWED_TAGS: [],
+    ALLOWED_ATTR: [],
+  })
+}
+```
+
+---
+
+## 도메인 타입 정의
+
+### 핵심 타입
+
+```typescript
+// types/library.ts
+export type LibraryType = 'public' | 'smart' | 'education'
+
+export interface Library {
+  id: string
+  name: string
+  type: LibraryType
+  address: string
+  phone: string
+  hours: string
+  url: string
+  lat: number
+  lng: number
+}
+
+export interface LibraryStatus extends Library {
+  hasBook: boolean
+  isAvailable: boolean
+  status: 'available' | 'on-loan' | 'in-library-only'
+  dueDate: string | null
+  location: string
+  callNumber: string
+  distance?: number
+}
+
+// types/book.ts
+export interface BookInfo {
+  title: string
+  author: string
+  publisher: string
+  year: string
+  isbn: string
+  cover: string
+  description: string
+}
+
+// types/search.ts
+export interface SearchParams {
+  title?: string
+  author?: string
+  publisher?: string
+}
+
+export interface SearchResponse {
+  book: BookInfo
+  libraries: LibraryStatus[]
+}
+```
+
+---
+
+## 커스텀 훅 패턴
+
+```typescript
+// lib/hooks/use-search.ts
+import { useQuery } from '@tanstack/react-query'
+
+export function useSearchQuery(params: SearchParams) {
+  return useQuery({
+    queryKey: ['search', params],
+    queryFn: async () => {
+      const query = new URLSearchParams()
+      if (params.title) query.set('title', params.title)
+      if (params.author) query.set('author', params.author)
+      if (params.publisher) query.set('publisher', params.publisher)
+      
+      const res = await fetch(`/api/search?${query}`)
+      if (!res.ok) throw new Error('검색 실패')
+      return res.json() as Promise<SearchResponse>
+    },
+    enabled: !!(params.title || params.author || params.publisher),
+    staleTime: 5 * 60 * 1000, // 5분
+  })
+}
+```
+
+---
+
+## 에러 처리
+
+### 에러 바운더리
+
+```typescript
+// app/error.tsx
+'use client'
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string }
+  reset: () => void
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <h2 className="text-2xl font-bold mb-4">오류가 발생했습니다</h2>
+      <p className="text-gray-600 mb-8">{error.message}</p>
+      <button
+        onClick={reset}
+        className="btn-primary"
+      >
+        다시 시도
+      </button>
+    </div>
+  )
+}
+```
+
+### API 에러 응답
+
+```typescript
+// app/api/search/route.ts
+export async function GET(request: NextRequest) {
+  try {
+    // 비즈니스 로직
+  } catch (error) {
+    console.error('Search error:', error)
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: '잘못된 요청입니다', details: error.errors },
+        { status: 400 }
+      )
+    }
+    
+    return NextResponse.json(
+      { error: '검색 중 오류가 발생했습니다' },
+      { status: 500 }
+    )
+  }
+}
+```
+
+---
+
+## 테스팅 (향후 확장)
+
+### 단위 테스트
+```typescript
+// lib/utils/__tests__/format.test.ts
+import { formatDistance } from '../format'
+
+describe('formatDistance', () => {
+  it('should format distance in km', () => {
+    expect(formatDistance(1234)).toBe('1.2km')
+  })
+})
+```
+
+---
+
+## Git Commit 컨벤션
+
+```
+feat: 새로운 기능 추가
+fix: 버그 수정
+docs: 문서 수정
+style: 코드 포맷팅 (기능 변경 없음)
+refactor: 리팩토링
+test: 테스트 추가/수정
+chore: 빌드 설정, 패키지 업데이트
+```
+
+**예시**
+```
+feat: 도서관 카드 컴포넌트 추가
+fix: 검색 결과 정렬 오류 수정
+docs: README에 설치 방법 추가
+```
+
+---
+
+## 체크리스트
+
+### 새로운 컴포넌트 작성 시
+- [ ] Server Component인지 Client Component인지 결정
+- [ ] TypeScript 타입 정의 (Props, 반환 타입)
+- [ ] 접근성 고려 (ARIA, 시맨틱 HTML)
+- [ ] Tailwind CSS 디자인 토큰 사용
+- [ ] 반응형 디자인 (모바일 우선)
+- [ ] 에러 바운더리 고려
+- [ ] 로딩 상태 처리
+
+### API Route 작성 시
+- [ ] 입력 검증 (Zod 스키마)
+- [ ] Rate limiting 적용
+- [ ] 에러 핸들링
+- [ ] 캐싱 전략 (Redis)
+- [ ] maxDuration 설정
+- [ ] CORS 헤더 (필요시)
+
+### 크롤링 로직 작성 시
+- [ ] Cheerio 사용 (Puppeteer 금지)
+- [ ] 재시도 로직
+- [ ] 타임아웃 설정
+- [ ] User-Agent 설정
+- [ ] Rate limiting 준수
+- [ ] 에러 핸들링
+
+---
+
+## 금지 사항
+
+### 절대 하지 말 것 ✗
+1. `any` 타입 사용
+2. `@ts-ignore` 주석
+3. 환경 변수 하드코딩
+4. 인라인 스타일 (Tailwind 대신)
+5. Puppeteer 사용 (Cheerio 사용)
+6. console.log 프로덕션 코드에 남기기
+7. 접근성 무시 (outline: none)
+8. 패치되지 않은 React/Next.js 버전
+9. 색상만으로 정보 전달
+10. 16px 미만 폰트 크기
+
+---
+
+## 참고 문서
+
+- [서비스 기획안](./docs/service-proposal.md)
+- [디자인 가이드](./docs/design-guide.md)
+- [와이어프레임](./docs/wireframes.md)
+- [코드 아키텍처](./docs/code-architecture.md)
+- [Next.js 15 문서](https://nextjs.org/docs)
+- [React 19 문서](https://react.dev)
+- [Tailwind CSS 4 문서](https://tailwindcss.com)
+
+---
+
+**마지막 업데이트**: 2026-01-22  
+**버전**: 1.0.0
