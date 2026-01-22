@@ -18,28 +18,31 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         className={cn(
-          // 기본 스타일
+          // 기본 스타일 - Apple Style
           'inline-flex items-center justify-center',
-          'px-8 py-4 rounded-md font-semibold',
-          'min-h-touch min-w-touch',
-          'transition-all duration-200',
+          'px-6 py-3 rounded-xl font-semibold',
+          'min-h-[44px] min-w-[44px]',
+          'transition-all duration-300',
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
           // variant별 스타일
           variant === 'primary' && [
-            'bg-primary text-white',
-            'hover:bg-primary-dark active:bg-primary-dark',
+            // 그라디언트 배경 - project13 스타일
+            'bg-gradient-to-br from-[#34C759] to-[#30D158] text-white',
+            // 향상된 hover 효과
+            'hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(52,199,89,0.4)]',
+            'active:translate-y-0',
             'focus-visible:outline-primary',
-            'disabled:bg-text-disabled',
+            'disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none',
           ],
           variant === 'secondary' && [
-            'bg-transparent text-primary',
-            'border border-primary',
-            'hover:bg-primary-lighter active:bg-primary-lighter',
+            'bg-bg-surface text-primary',
+            'border-2 border-bg-border',
+            'hover:bg-primary-lighter hover:border-primary-light hover:-translate-y-0.5 active:scale-95',
             'focus-visible:outline-primary',
-            'disabled:border-text-disabled disabled:text-text-disabled',
+            'disabled:border-text-disabled disabled:text-text-disabled disabled:opacity-50',
           ],
           // 비활성 상태
-          disabled && 'cursor-not-allowed opacity-60',
+          disabled && 'cursor-not-allowed',
           className
         )}
         disabled={disabled}

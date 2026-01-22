@@ -12,14 +12,14 @@ interface FilterCheckboxProps {
  */
 export function FilterCheckbox({ checked, onChange }: FilterCheckboxProps) {
   return (
-    <label className="flex items-center gap-2 cursor-pointer">
+    <label className="flex items-center gap-2.5 cursor-pointer">
       <input
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="w-4 h-4 text-primary rounded focus:ring-2 focus:ring-primary cursor-pointer"
+        className="w-5 h-5 text-primary rounded-md focus:ring-2 focus:ring-primary cursor-pointer accent-primary"
       />
-      <span className="text-body text-text-secondary">
+      <span className="text-body-sm text-text-secondary">
         대출 가능만 보기
       </span>
     </label>

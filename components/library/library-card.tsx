@@ -32,17 +32,17 @@ export function LibraryCard({ library }: LibraryCardProps) {
   }
 
   return (
-    <Card className="w-full hover:shadow-md transition-shadow">
-      <CardHeader>
+    <Card className="w-full hover:shadow-md transition-all">
+      <CardHeader className="pb-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <CardTitle className="mb-2">{library.libraryName}</CardTitle>
+            <CardTitle className="mb-3 text-h3">{library.libraryName}</CardTitle>
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant={getLibraryTypeBadgeVariant(library.libraryType)}>
                 {getLibraryTypeLabel(library.libraryType)}
               </Badge>
               {library.distance !== undefined && (
-                <span className="text-body-sm text-text-secondary">
+                <span className="text-caption text-text-tertiary font-medium">
                   📍 {library.distance}km
                 </span>
               )}
@@ -51,7 +51,7 @@ export function LibraryCard({ library }: LibraryCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
         {/* 소장 및 대출 상태 */}
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant={library.hasBook ? 'owned' : 'not-owned'}>
@@ -63,7 +63,7 @@ export function LibraryCard({ library }: LibraryCardProps) {
             </Badge>
           )}
           {library.dueDate && (
-            <span className="text-body-sm text-text-tertiary">
+            <span className="text-caption text-text-tertiary">
               반납예정: {library.dueDate}
             </span>
           )}
@@ -95,7 +95,7 @@ export function LibraryCard({ library }: LibraryCardProps) {
 
         {/* 버튼 */}
         {library.url && (
-          <div className="flex gap-3">
+          <div className="flex gap-3 pt-2">
             <Link
               href={library.url}
               target="_blank"
@@ -103,7 +103,7 @@ export function LibraryCard({ library }: LibraryCardProps) {
               className="flex-1"
               aria-label={`${library.libraryName} 상세보기 (새 창)`}
             >
-              <Button variant="secondary" className="w-full">
+              <Button variant="secondary" className="w-full text-body-sm">
                 상세보기
               </Button>
             </Link>
@@ -115,7 +115,7 @@ export function LibraryCard({ library }: LibraryCardProps) {
                 className="flex-1"
                 aria-label={`${library.libraryName}에서 예약하기 (새 창)`}
               >
-                <Button variant="primary" className="w-full">
+                <Button variant="primary" className="w-full text-body-sm">
                   예약하기
                 </Button>
               </Link>

@@ -9,67 +9,67 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Primary Green (소나무 초록)
+        // Apple Green Theme - Primary Colors
         primary: {
-          DEFAULT: '#2D7A4E',
-          light: '#4CAF6F',
+          DEFAULT: '#34C759',
+          light: '#30D158',
           lighter: '#E8F5E9',
-          dark: '#1B5E3A',
+          dark: '#248A3D',
         },
-        // 상태 색상
+        // 상태 색상 - Green Theme
         status: {
           available: {
-            bg: '#DCFCE7',
-            text: '#15803D',
+            bg: '#E8F5E9',
+            text: '#248A3D',
           },
           'on-loan': {
-            bg: '#FEE2E2',
-            text: '#B91C1C',
+            bg: '#FFE8E8',
+            text: '#FF3B30',
           },
           'in-library': {
-            bg: '#FEF3C7',
-            text: '#92400E',
+            bg: '#FFF9E6',
+            text: '#FF9500',
           },
           owned: {
-            bg: '#F3F4F6',
-            text: '#15803D',
+            bg: '#E8F5E9',
+            text: '#248A3D',
           },
           'not-owned': {
-            bg: '#F3F4F6',
-            text: '#B91C1C',
+            bg: '#F5F5F7',
+            text: '#FF3B30',
           },
         },
-        // 도서관 유형 색상
+        // 도서관 유형 색상 - Green Theme
         library: {
-          public: '#3455b3',
-          smart: '#8B5CF6',
-          education: 'rgb(12, 167, 115)',
+          public: '#34C759',
+          smart: '#AF52DE',
+          education: '#007AFF',
         },
-        // 중립 색상
+        // iOS 스타일 중립 색상
         text: {
-          primary: '#1E293B',
-          secondary: '#475569',
-          tertiary: '#94A3B8',
-          disabled: '#CBD5E1',
+          primary: '#1D1D1F',
+          secondary: '#86868B',
+          tertiary: '#8E8E93',
+          disabled: '#C7C7CC',
         },
         bg: {
-          DEFAULT: '#FFFFFF',
-          surface: '#F9FAFB',
-          border: '#E5E7EB',
-          divider: '#D1D5DB',
+          DEFAULT: '#F5F5F7',
+          surface: '#FFFFFF',
+          border: '#D2D2D7',
+          divider: '#E5E5EA',
         },
       },
       fontFamily: {
-        sans: ['Pretendard Variable', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'Pretendard Variable', 'Pretendard', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
       },
       fontSize: {
-        // 모바일 우선 (16px 기본)
-        'h1': ['28px', { lineHeight: '1.4', fontWeight: '700' }],
-        'h2': ['24px', { lineHeight: '1.4', fontWeight: '700' }],
-        'h3': ['20px', { lineHeight: '1.4', fontWeight: '600' }],
-        'body': ['16px', { lineHeight: '1.6', fontWeight: '400' }],
-        'body-sm': ['14px', { lineHeight: '1.6', fontWeight: '400' }],
-        'caption': ['12px', { lineHeight: '1.5', fontWeight: '400' }],
+        // SF Pro 스타일 타이포그래피
+        'h1': ['34px', { lineHeight: '1.25', fontWeight: '700', letterSpacing: '-0.02em' }],
+        'h2': ['28px', { lineHeight: '1.29', fontWeight: '700', letterSpacing: '-0.015em' }],
+        'h3': ['22px', { lineHeight: '1.36', fontWeight: '600', letterSpacing: '-0.01em' }],
+        'body': ['17px', { lineHeight: '1.47', fontWeight: '400' }],
+        'body-sm': ['15px', { lineHeight: '1.47', fontWeight: '400' }],
+        'caption': ['13px', { lineHeight: '1.38', fontWeight: '400' }],
       },
       spacing: {
         // 8px 기반 스페이싱
@@ -85,15 +85,16 @@ const config: Config = {
         '16': '64px',
       },
       borderRadius: {
-        'sm': '4px',
-        'md': '8px',
-        'lg': '12px',
-        'xl': '16px',
+        'sm': '8px',
+        'md': '12px',
+        'lg': '16px',
+        'xl': '20px',
+        '2xl': '24px',
       },
       boxShadow: {
-        'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-        'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        'sm': '0 1px 3px rgba(0, 0, 0, 0.08)',
+        'md': '0 4px 12px rgba(0, 0, 0, 0.1)',
+        'lg': '0 8px 24px rgba(0, 0, 0, 0.12)',
       },
       minHeight: {
         'touch': '44px', // 최소 터치 타겟

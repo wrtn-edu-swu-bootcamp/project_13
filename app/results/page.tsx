@@ -117,9 +117,9 @@ function ResultsContent() {
   // 에러 상태
   if (searchError) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <p className="text-h2 text-text-primary">검색 중 오류가 발생했습니다</p>
+      <div className="min-h-screen flex items-center justify-center bg-bg">
+        <div className="text-center space-y-6 p-8">
+          <p className="text-h2 text-text-primary font-semibold">검색 중 오류가 발생했습니다</p>
           <p className="text-body text-text-secondary">
             {searchError.message}
           </p>
@@ -134,9 +134,9 @@ function ResultsContent() {
   // 검색 결과 없음
   if (!searchData?.book) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <p className="text-h2 text-text-primary">검색 결과가 없습니다</p>
+      <div className="min-h-screen flex items-center justify-center bg-bg">
+        <div className="text-center space-y-6 p-8">
+          <p className="text-h2 text-text-primary font-semibold">검색 결과가 없습니다</p>
           <p className="text-body text-text-secondary">
             다른 검색어로 시도해보세요
           </p>
@@ -150,33 +150,34 @@ function ResultsContent() {
 
   return (
     <main className="min-h-screen bg-bg">
-      <div className="container-responsive py-8">
-        {/* 헤더 */}
-        <header className="mb-8">
+      <div className="container-responsive py-8 md:py-12">
+        {/* 헤더 - Apple Style */}
+        <header className="mb-10">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-body text-primary hover:text-primary-dark transition-colors mb-4"
+            className="inline-flex items-center gap-2 text-body-sm text-primary hover:text-primary-dark transition-colors mb-6 font-medium"
           >
             ← 뒤로가기
           </Link>
-          <h1 className="text-h1 font-bold text-primary">검색 결과</h1>
+          <h1 className="text-h1 font-bold text-text-primary tracking-tight">검색 결과</h1>
         </header>
 
         {/* 도서 정보 카드 */}
-        <div className="mb-8">
+        <div className="mb-10">
           <BookInfoCard book={searchData.book} />
         </div>
 
         {/* 위치 정보 */}
         {!hasLocation && (
-          <div className="mb-6 p-4 bg-primary-lighter rounded-lg">
-            <p className="text-body text-text-secondary mb-3">
+          <div className="mb-8 p-5 bg-bg-surface rounded-2xl border border-bg-border">
+            <p className="text-body-sm text-text-secondary mb-4">
               📍 현재 위치를 허용하면 가까운 도서관부터 보여드립니다
             </p>
             <Button
               variant="secondary"
               onClick={getLocation}
               disabled={locationLoading}
+              className="text-body-sm"
             >
               {locationLoading ? '위치 확인 중...' : '위치 권한 허용하기'}
             </Button>
@@ -184,7 +185,7 @@ function ResultsContent() {
         )}
 
         {/* 필터 및 정렬 */}
-        <div className="mb-6 p-6 bg-bg-surface rounded-lg border border-bg-border">
+        <div className="mb-8 p-5 bg-bg-surface rounded-2xl border border-bg-border">
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             <SortOptions value={sortType} onChange={setSortType} />
             <div className="md:ml-auto">
@@ -197,17 +198,17 @@ function ResultsContent() {
         </div>
 
         {/* 도서관 목록 */}
-        <div className="space-y-6 mb-8">
+        <div className="space-y-4 mb-10">
           {filteredAndSortedLibraries.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-body text-text-secondary">
+            <div className="text-center py-16">
+              <p className="text-body text-text-tertiary">
                 조건에 맞는 도서관이 없습니다
               </p>
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between">
-                <h2 className="text-h3 font-bold text-text-primary">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-h3 font-semibold text-text-primary">
                   소장 도서관 ({filteredAndSortedLibraries.length}개)
                 </h2>
               </div>
@@ -219,7 +220,7 @@ function ResultsContent() {
         </div>
 
         {/* 다른 책 검색하기 */}
-        <div className="text-center">
+        <div className="text-center pt-4">
           <Button variant="primary" onClick={() => router.push('/')}>
             다른 책 검색하기
           </Button>

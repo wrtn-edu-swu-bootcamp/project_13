@@ -25,18 +25,18 @@ export function Badge({ className, variant, children, icon, ...props }: BadgePro
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 px-3 py-1.5 rounded-full',
-        'text-body-sm font-medium',
+        'inline-flex items-center gap-1 px-2.5 py-1 rounded-full',
+        'text-caption font-semibold',
         // 상태 배지
         variant === 'available' && 'bg-status-available-bg text-status-available-text',
         variant === 'on-loan' && 'bg-status-on-loan-bg text-status-on-loan-text',
         variant === 'in-library' && 'bg-status-in-library-bg text-status-in-library-text',
         variant === 'owned' && 'bg-status-owned-bg text-status-owned-text',
         variant === 'not-owned' && 'bg-status-not-owned-bg text-status-not-owned-text',
-        // 도서관 유형 배지
-        variant === 'library-public' && 'bg-blue-100 text-library-public',
+        // 도서관 유형 배지 - Green Theme
+        variant === 'library-public' && 'bg-primary-lighter text-primary-dark',
         variant === 'library-smart' && 'bg-purple-100 text-library-smart',
-        variant === 'library-education' && 'bg-teal-100 text-library-education',
+        variant === 'library-education' && 'bg-blue-100 text-library-education',
         className
       )}
       {...props}

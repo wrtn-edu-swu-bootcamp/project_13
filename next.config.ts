@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
         hostname: 'image.aladin.co.kr',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'shopping-phinf.pstatic.net',
+        pathname: '/**',
+      },
     ],
   },
 

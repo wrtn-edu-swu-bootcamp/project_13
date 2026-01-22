@@ -30,15 +30,19 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            'w-full px-4 py-4 border rounded-md',
-            'text-body text-text-primary',
-            'placeholder:text-text-tertiary',
-            'focus:outline-none focus:ring-2 focus:border-transparent',
-            'disabled:bg-bg-surface disabled:cursor-not-allowed',
-            'transition-all duration-200',
+            // project13 스타일 - 더 큰 패딩과 향상된 전환
+            'w-full px-5 py-4 border-2 rounded-xl',
+            'text-base text-text-primary font-normal',
+            'placeholder:text-text-secondary',
+            'bg-bg',
+            // focus 시 배경색을 흰색으로 변경
+            'focus:outline-none focus:border-primary focus:bg-white',
+            'focus:shadow-[0_0_0_4px_rgba(52,199,89,0.1)]',
+            'disabled:bg-bg disabled:cursor-not-allowed disabled:opacity-50',
+            'transition-all duration-300',
             error
-              ? 'border-status-on-loan-text focus:ring-status-on-loan-text'
-              : 'border-bg-border focus:ring-primary',
+              ? 'border-status-on-loan-text focus:border-status-on-loan-text focus:shadow-[0_0_0_4px_rgba(255,59,48,0.1)]'
+              : 'border-bg-border hover:border-primary-light',
             className
           )}
           {...props}

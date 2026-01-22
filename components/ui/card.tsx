@@ -14,10 +14,11 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          'bg-white rounded-lg shadow-md p-6',
-          'border border-bg-border',
-          'transition-shadow duration-200',
-          'hover:shadow-lg',
+          'bg-bg-surface rounded-2xl shadow-md p-6',
+          'border-2 border-transparent',
+          'transition-all duration-300 ease-out',
+          // 향상된 hover 효과 - project13 스타일
+          'hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:-translate-y-1 hover:border-[#E8F5E9]',
           className
         )}
         {...props}

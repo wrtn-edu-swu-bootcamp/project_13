@@ -58,7 +58,39 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <Providers>{children}</Providers>
+        <div className="min-h-screen flex flex-col">
+          {/* 그라디언트 헤더 - project13 스타일 */}
+          <header className="bg-gradient-to-br from-[#34C759] to-[#30D158] text-white shadow-md">
+            <div className="max-w-[800px] mx-auto px-8 py-12 md:py-16 text-center">
+              <div className="flex items-center justify-center gap-4 mb-2">
+                {/* 책 로고 아이콘 */}
+                <svg 
+                  width="32" 
+                  height="32" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2"
+                  className="text-white"
+                >
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                <h1 className="text-[2rem] font-bold tracking-tight">송파 도서관 통합 검색</h1>
+              </div>
+              <p className="text-base opacity-90 font-normal">송파구통합도서관 · 교육청송파도서관</p>
+            </div>
+          </header>
+          
+          <Providers>{children}</Providers>
+          
+          {/* 푸터 - project13 스타일 */}
+          <footer className="text-center px-8 py-8 text-[#86868B] text-[0.9rem] mt-12">
+            <p>송파 도서관 통합 검색</p>
+            <p className="text-[0.85rem] mt-1">실시간 도서관 데이터를 제공합니다</p>
+          </footer>
+        </div>
+        
         <Analytics />
         <SpeedInsights />
       </body>
