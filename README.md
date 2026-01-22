@@ -1,27 +1,27 @@
-# Songpa Library Book Search
+# 송파구 도서관 책크
 
-## 📚 Project Overview
+## 📚 프로젝트 소개
 
-An integrated search service that allows users to search for book availability and loan status across 24 libraries in Songpa-gu, Seoul in one place.
+송파구 내 24개 도서관의 도서 소장 및 대출 가능 여부를 한 번에 검색하는 통합 검색 서비스입니다.
 
-This service eliminates the hassle of visiting multiple library websites to find books, helping users locate their desired books quickly and efficiently.
+특정 도서관에 원하는 책이 없을 때 다른 도서관 홈페이지를 일일이 방문해야 하는 번거로움을 해소하고, 사용자가 가장 빠르게 원하는 책을 찾을 수 있도록 돕습니다.
 
-## 🎯 Key Features
+## 🎯 주요 기능
 
-- Unified book search across multiple libraries
-- Real-time availability and loan status for 24 libraries
-- Map-based library location information
-- Detailed information for each library
+- 통합 도서 검색
+- 24개 도서관 실시간 소장/대출 현황 확인
+- 지도 기반 도서관 위치 정보
+- 도서관별 상세 정보 제공
 
-## 📂 Documentation
+## 📂 문서
 
-- [Service Proposal](./docs/service-proposal.md)
-- [Wireframes](./docs/wireframes.md)
+- [서비스 기획안](./docs/service-proposal.md)
+- [와이어프레임](./docs/wireframes.md)
 
-## 🛠 Tech Stack
+## 🛠 기술 스택
 
 TBD
 
-## 👥 Team Members
+## 👥 팀원
 
 TBD
