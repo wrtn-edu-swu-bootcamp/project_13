@@ -34,19 +34,45 @@
 
 **책크**는 송파구 내 24개 도서관(공공도서관 14개, 스마트도서관 9개, 교육청도서관 1개)의 도서 소장 및 대출 가능 여부를 한 번에 검색하는 통합 검색 서비스입니다.
 
-### 핵심 기능
+### 핵심 기능 (MVP)
 
-#### MVP (Phase 1)
 - **통합 도서 검색**: 제목, 저자, 출판사 기반 복합 검색
 - **실시간 대출 현황**: 각 도서관의 실시간 소장 및 대출 가능 여부 확인
 - **위치 기반 정렬**: 사용자 위치에서 가까운 도서관 순으로 자동 정렬
 - **도서관 상세 정보**: 운영 시간, 연락처, 주소, 예약 링크 제공
+- **반응형 디자인**: 모바일, 태블릿, 데스크톱 대응
+- **접근성**: 모든 연령대가 쉽게 사용 가능한 UI
 
-#### 향후 확장 (Phase 2-5)
-- 대출 가능 알림 기능
-- 지도 기반 위치 서비스 (카카오맵 통합)
-- 사용자 프로필 및 독서 이력 관리
-- 지역 확대 (강남, 강동, 광진 등)
+### MVP 개발 단계
+
+본 프로젝트는 5단계(Phase)로 나누어 개발합니다:
+
+```
+Phase 1: 환경 구축 및 기초 설정 (1-2주)
+   → 개발 환경, 디자인 시스템, TypeScript 타입
+
+Phase 2: 백엔드 인프라 및 크롤링 (2-3주)
+   → Redis, 웹 크롤러, API Routes
+
+Phase 3: 프론트엔드 구현 (2-3주)
+   → React 컴포넌트, 페이지, 위치 기능
+
+Phase 4: 최적화 및 배포 준비 (1-2주)
+   → 성능, 접근성, 보안, Vercel 설정
+
+Phase 5: 테스트 및 배포 (1주)
+   → QA, 프로덕션 배포, 모니터링
+```
+
+**총 예상 기간**: 7-11주 (약 2-3개월)
+
+### MVP 이후 확장 계획
+
+- **Phase 2+ (알림)**: 대출 가능 알림, 신간 알림
+- **Phase 3+ (지도)**: 카카오맵 통합, 길찾기 연동
+- **Phase 4+ (사용자)**: 회원 시스템, 독서 이력 관리
+- **Phase 5+ (지역확대)**: 서울시 전역, 전국 확대
+- **Phase 6+ (커뮤니티)**: 리뷰, 독서 모임
 
 ### 기술 선정 철학
 
@@ -2156,9 +2182,176 @@ pnpm type-check
 
 ---
 
-## 향후 확장 계획
+## MVP 개발 로드맵
 
-### Phase 2: 알림 기능
+### Phase 1: 환경 구축 및 기초 설정 (1-2주)
+
+**목표**: 프로젝트 기본 구조와 디자인 시스템 구축
+
+#### 1-1. 개발 환경 구축
+- Node.js 20.x 및 pnpm 설치
+- Git 저장소 초기화
+- Next.js 15.5.9 프로젝트 생성
+- 필수 의존성 패키지 설치
+- TypeScript 설정
+- 폴더 구조 생성
+
+#### 1-2. 디자인 시스템 구축
+- Tailwind CSS 설정 (디자인 가이드 기반)
+- 전역 스타일 작성 (`globals.css`)
+- Pretendard 폰트 통합 (CDN)
+- 기본 UI 컴포넌트 작성 (Button, Input, Card, Loading)
+- 배지 컴포넌트 작성 (상태 및 도서관 유형)
+
+#### 1-3. TypeScript 타입 정의
+- 도서관 관련 타입 (`types/library.ts`)
+- 도서 관련 타입 (`types/book.ts`)
+- 검색 관련 타입 (`types/search.ts`)
+- API 응답 타입 (`types/api.ts`)
+
+**주요 작업물**:
+- 완성된 폴더 구조
+- 디자인 시스템 (색상, 폰트, 컴포넌트)
+- 타입 정의 파일
+
+**참고 문서**: `docs/DEVELOPMENT_TODO.md` → Phase 1 (38-272번 줄)
+
+---
+
+### Phase 2: 백엔드 인프라 및 크롤링 구현 (2-3주)
+
+**목표**: 데이터 수집을 위한 백엔드 시스템과 API 구축
+
+#### 2-1. 백엔드 인프라 구축
+- Upstash Redis 계정 생성 및 연동
+- Redis 클라이언트 설정
+- 캐싱 전략 구현 (검색: 5분, 도서관: 24시간, 도서: 7일)
+- Rate Limiting 구현 (IP 기반, 1분에 10회)
+
+#### 2-2. 웹 크롤링 구현
+- 크롤링 유틸리티 함수 작성 (재시도, 에러 핸들링)
+- 송파구통합도서관 크롤러 작성 (23개)
+- 교육청도서관 크롤러 작성 (1개)
+- 크롤러 통합 및 병렬 처리
+
+#### 2-3. API Routes 구현
+- 도서 검색 API (`/api/search`)
+- 도서관 목록 API (`/api/libraries`)
+- 헬스체크 API (`/api/health`)
+
+**주요 작업물**:
+- Redis 캐싱 시스템
+- 웹 크롤러 (Cheerio 기반)
+- RESTful API 엔드포인트
+
+**참고 문서**: `docs/DEVELOPMENT_TODO.md` → Phase 2 (273-427번 줄)
+
+---
+
+### Phase 3: 프론트엔드 구현 (2-3주)
+
+**목표**: 사용자 인터페이스와 인터랙션 구현
+
+#### 3-1. 프론트엔드 컴포넌트 구현
+- React Query Provider 설정
+- 커스텀 훅 작성 (useSearch, useLibraries, useLocation, useRecentSearches)
+- 검색 폼 컴포넌트
+- 최근 검색어 컴포넌트
+- 도서 정보 카드 컴포넌트
+- 도서관 카드 컴포넌트
+- 필터 및 정렬 컴포넌트
+
+#### 3-2. 페이지 구현
+- 루트 레이아웃 (`app/layout.tsx`)
+- 검색 화면 (메인 페이지)
+- 검색 결과 화면
+- 로딩 화면
+- 에러 화면
+
+#### 3-3. 위치 기반 기능 구현
+- Geolocation API 통합
+- 거리 계산 유틸리티 (Haversine 공식)
+- 도서관 정렬 로직 (거리순/대출가능 우선)
+
+**주요 작업물**:
+- 모든 화면 및 컴포넌트
+- 위치 기반 정렬 기능
+- 반응형 디자인
+
+**참고 문서**: `docs/DEVELOPMENT_TODO.md` → Phase 3 (429-638번 줄)
+
+---
+
+### Phase 4: 최적화 및 배포 준비 (1-2주)
+
+**목표**: 성능, 접근성, 보안 최적화 및 배포 설정
+
+#### 4-1. 성능 최적화
+- 이미지 최적화 (next/image)
+- 코드 스플리팅 (dynamic import)
+- Server Components 최대 활용
+- 캐시 최적화 (Redis + TanStack Query)
+
+#### 4-2. 접근성 구현
+- 시맨틱 HTML 적용
+- ARIA 레이블 추가
+- 키보드 접근성 확보
+- 색상 대비 확인 (WCAG AA 기준)
+
+#### 4-3. 보안 강화
+- 환경 변수 보호
+- Input Sanitization 적용
+- Rate Limiting 테스트
+- CORS 설정
+- CSP (Content Security Policy) 설정
+
+#### 4-4. 배포 준비
+- Vercel 계정 생성 및 프로젝트 연결
+- 환경 변수 설정
+- `vercel.json` 설정 파일 작성
+- 프로덕션 빌드 테스트
+
+**주요 작업물**:
+- 최적화된 프로덕션 빌드
+- 접근성 준수
+- 보안 강화
+- Vercel 배포 설정 완료
+
+**참고 문서**: `docs/DEVELOPMENT_TODO.md` → Phase 4 (640-826번 줄)
+
+---
+
+### Phase 5: 테스트 및 배포 (1주)
+
+**목표**: 품질 검증 및 프로덕션 배포
+
+#### 5-1. 테스트 및 QA
+- 기능 테스트 (검색, 정렬, 필터 등)
+- 반응형 테스트 (모바일/태블릿/데스크톱)
+- 접근성 테스트 (Lighthouse, axe DevTools)
+- 성능 테스트 (FCP, LCP, TTI, CLS)
+- 크롤링 안정성 테스트
+
+#### 5-2. 배포 및 모니터링
+- 첫 배포 실행 (Vercel)
+- Vercel Analytics 설정
+- Speed Insights 설정
+- 에러 모니터링 설정
+
+**주요 작업물**:
+- QA 완료
+- 프로덕션 배포
+- 모니터링 시스템 가동
+
+**참고 문서**: `docs/DEVELOPMENT_TODO.md` → Phase 5 (828-956번 줄)
+
+---
+
+## MVP 이후 확장 계획
+
+MVP 출시 후 사용자 피드백을 반영하여 순차적으로 추가할 기능들입니다.
+
+### 확장 Phase 1: 알림 기능 (MVP+1)
 
 #### 기술 스택
 - **Push Notifications**: Web Push API
@@ -2199,7 +2392,11 @@ export async function GET() {
 }
 ```
 
-### Phase 3: 지도 기반 위치 서비스
+**참고 문서**: `docs/service-proposal.md` → "Phase 2: 알림 기능" (491번 줄)
+
+---
+
+### 확장 Phase 2: 지도 기반 위치 서비스 (MVP+2)
 
 #### 기술 스택
 - **Kakao Maps JavaScript SDK 2.7.9**
@@ -2241,7 +2438,11 @@ export function KakaoMap({ libraries }: { libraries: Library[] }) {
 }
 ```
 
-### Phase 4: 사용자 기능 강화
+**참고 문서**: `docs/service-proposal.md` → "Phase 3: 지도 기반 위치 서비스" (496번 줄)
+
+---
+
+### 확장 Phase 3: 사용자 기능 강화 (MVP+3)
 
 #### 기술 스택
 - **인증**: NextAuth.js v5
@@ -2254,7 +2455,11 @@ export function KakaoMap({ libraries }: { libraries: Library[] }) {
 - 위시리스트 관리
 - 읽은 책 기록
 
-### Phase 5: 지역 확대
+**참고 문서**: `docs/service-proposal.md` → "Phase 4: 사용자 기능 강화" (537번 줄)
+
+---
+
+### 확장 Phase 4: 지역 확대 (MVP+4)
 
 #### 구현 개요
 - 송파구 → 강남구, 강동구, 광진구 확장
@@ -2290,9 +2495,34 @@ export async function searchBooksMultiRegion(
 }
 ```
 
+**참고 문서**: `docs/service-proposal.md` → "Phase 6: 지역 확대" (547번 줄)
+
+---
+
+### 확장 Phase 5: 커뮤니티 기능 (MVP+5)
+
+#### 추가 기능 (선택사항)
+- **도서 리뷰 및 평점**: 사용자 리뷰 작성
+- **독서 모임**: 지역별 독서 모임 정보
+- **추천 시스템**: AI 기반 도서 추천
+
+#### 기술 스택
+- Database (사용자 리뷰 저장)
+- AI/ML 추천 엔진 (선택사항)
+
+**참고 문서**: `docs/service-proposal.md` → "Phase 7: 커뮤니티 기능" (553번 줄)
+
 ---
 
 ## 참고 자료
+
+### 프로젝트 문서
+
+- **개발 Todo 리스트**: [`docs/DEVELOPMENT_TODO.md`](docs/DEVELOPMENT_TODO.md) - Phase별 상세 작업 목록
+- **서비스 기획안**: [`docs/service-proposal.md`](docs/service-proposal.md) - 서비스 목적, 기능, 사용자 시나리오
+- **와이어프레임**: [`docs/wireframes.md`](docs/wireframes.md) - 화면 구성, UI 레이아웃
+- **디자인 가이드**: [`docs/design-guide.md`](docs/design-guide.md) - 색상, 폰트, 컴포넌트 스타일
+- **프로젝트 규칙**: [`.cursorrules`](.cursorrules) - TypeScript 규칙, 스타일링, 보안
 
 ### 공식 문서
 
@@ -2333,6 +2563,12 @@ export async function searchBooksMultiRegion(
 
 ## 변경 이력
 
+- **v1.1 (2026-01-22)**: `DEVELOPMENT_TODO.md` 반영
+  - MVP 개발 단계를 Phase 1-5로 재구성 (환경구축 → 백엔드 → 프론트엔드 → 최적화 → 배포)
+  - 예상 개발 기간을 7-11주(약 2-3개월)로 조정
+  - 향후 확장 계획의 Phase 번호를 명확히 구분 (MVP+1, MVP+2, ...)
+  - 각 Phase별 주요 작업물과 참고 문서 링크 추가
+  - 커뮤니티 기능 (확장 Phase 5) 추가
 - **v1.0 (2026-01-22)**: 초안 작성
   - 최신 안정화 버전 기술 스택 선정
   - 전체 아키텍처 설계
