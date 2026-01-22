@@ -1,14 +1,26 @@
-import { Button } from '@/components/ui/button'
+'use client'
+
 import { Badge } from '@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { SearchForm } from '@/components/search/search-form'
+import { RecentSearches } from '@/components/search/recent-searches'
+import { useRecentSearches } from '@/lib/hooks/use-recent-searches'
 import { LIBRARY_STATS } from '@/lib/constants/libraries'
+import type { SearchParams } from '@/types/search'
 
 export default function HomePage() {
+  const { addSearch } = useRecentSearches()
+
+  const handleSearch = (params: SearchParams) => {
+    // 최근 검색어에 추가
+    addSearch(params)
+  }
+
   return (
     <main className="min-h-screen bg-bg">
-      <div className="container-responsive py-12">
+      <div className="container-responsive py-8 md:py-12">
         {/* 헤더 */}
-        <header className="text-center space-y-4 mb-12">
+        <header className="text-center space-y-3 mb-8">
           <h1 className="text-h1 font-bold text-primary">
             책크 📚
           </h1>
@@ -21,116 +33,44 @@ export default function HomePage() {
           </p>
         </header>
 
-        {/* 통계 카드 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <Card>
-            <CardHeader>
-              <CardTitle>공공도서관</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <Badge variant="library-public">공공</Badge>
-                <p className="text-h2 font-bold text-primary">
-                  {LIBRARY_STATS.public}개
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>스마트도서관</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <Badge variant="library-smart">스마트</Badge>
-                <p className="text-h2 font-bold text-primary">
-                  {LIBRARY_STATS.smart}개
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>교육청도서관</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <Badge variant="library-education">교육청</Badge>
-                <p className="text-h2 font-bold text-primary">
-                  {LIBRARY_STATS.education}개
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+        {/* 검색 폼 - 메인 컨텐츠로 강조 */}
+        <div className="mb-8">
+          <div className="max-w-3xl mx-auto">
+            <SearchForm onSearch={handleSearch} />
+          </div>
         </div>
 
-        {/* 주요 기능 */}
-        <Card className="mb-12">
-          <CardHeader>
-            <CardTitle>주요 기능</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <span className="text-primary text-h3">✓</span>
-                <div>
-                  <p className="text-body font-semibold text-text-primary">
-                    통합 도서 검색
-                  </p>
-                  <p className="text-body-sm text-text-secondary">
-                    제목, 저자, 출판사로 24개 도서관을 한 번에 검색
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-primary text-h3">✓</span>
-                <div>
-                  <p className="text-body font-semibold text-text-primary">
-                    실시간 대출 가능 여부
-                  </p>
-                  <p className="text-body-sm text-text-secondary">
-                    각 도서관의 실시간 대출 상태를 즉시 확인
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-primary text-h3">✓</span>
-                <div>
-                  <p className="text-body font-semibold text-text-primary">
-                    위치 기반 정렬
-                  </p>
-                  <p className="text-body-sm text-text-secondary">
-                    가까운 도서관 순으로 자동 정렬
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-primary text-h3">✓</span>
-                <div>
-                  <p className="text-body font-semibold text-text-primary">
-                    접근성 우선 디자인
-                  </p>
-                  <p className="text-body-sm text-text-secondary">
-                    모든 연령대가 쉽게 사용할 수 있는 UI
-                  </p>
-                </div>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
+        {/* 최근 검색어 */}
+        <div className="mb-8 max-w-3xl mx-auto">
+          <RecentSearches />
+        </div>
 
-        {/* CTA */}
-        <div className="text-center">
-          <p className="text-body text-text-secondary mb-6">
-            Phase 1 환경 구축이 완료되었습니다! 🎉
-            <br />
-            Phase 2에서 검색 기능을 구현하겠습니다.
-          </p>
-          <Button variant="primary" disabled>
-            도서 검색하기 (Phase 2에서 구현 예정)
-          </Button>
+        {/* 안내 메시지 및 통계 */}
+        <div className="max-w-3xl mx-auto space-y-4">
+          {/* 사용 팁 */}
+          <div className="p-4 bg-primary-lighter rounded-lg text-center">
+            <p className="text-body text-text-primary">
+              💡 여러 검색어를 함께 입력하면 더 정확한 검색 결과를 얻을 수 있습니다
+            </p>
+          </div>
+
+          {/* 간소화된 통계 */}
+          <div className="flex items-center justify-center gap-4 flex-wrap text-body-sm text-text-secondary">
+            <div className="flex items-center gap-2">
+              <Badge variant="library-public">공공</Badge>
+              <span>{LIBRARY_STATS.public}개</span>
+            </div>
+            <span className="text-text-tertiary">·</span>
+            <div className="flex items-center gap-2">
+              <Badge variant="library-smart">스마트</Badge>
+              <span>{LIBRARY_STATS.smart}개</span>
+            </div>
+            <span className="text-text-tertiary">·</span>
+            <div className="flex items-center gap-2">
+              <Badge variant="library-education">교육청</Badge>
+              <span>{LIBRARY_STATS.education}개</span>
+            </div>
+          </div>
         </div>
       </div>
     </main>

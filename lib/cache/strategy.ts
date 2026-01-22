@@ -24,6 +24,10 @@ export const CACHE_TTL = {
  */
 export async function getCached<T>(key: string): Promise<T | null> {
   try {
+    if (!redis) {
+      return null
+    }
+    
     const cached = await redis.get(key)
     
     if (!cached) {
@@ -52,6 +56,9 @@ export async function setCached<T>(
   ttl: number
 ): Promise<void> {
   try {
+    if (!redis) {
+      return
+    }
     // setex: SET with EXpiration
     await redis.setex(key, ttl, JSON.stringify(value))
   } catch (error) {
@@ -67,6 +74,9 @@ export async function setCached<T>(
  */
 export async function deleteCached(key: string): Promise<void> {
   try {
+    if (!redis) {
+      return
+    }
     await redis.del(key)
   } catch (error) {
     console.error('Cache delete error:', error)
@@ -80,6 +90,9 @@ export async function deleteCached(key: string): Promise<void> {
  */
 export async function deleteCachedByPattern(pattern: string): Promise<void> {
   try {
+    if (!redis) {
+      return
+    }
     const keys = await redis.keys(pattern)
     
     if (keys.length > 0) {

@@ -7,6 +7,18 @@ import { checkRateLimit } from '@/lib/rate-limit'
 import type { SearchParams, SearchResponse } from '@/types/search'
 
 /**
+ * 서버 사이드에서 입력 정제 (간단한 XSS 방지)
+ */
+function sanitizeServerInput(input: string): string {
+  if (!input) return ''
+  // HTML 태그와 특수 문자 제거
+  return input
+    .replace(/<[^>]*>/g, '') // HTML 태그 제거
+    .replace(/[<>'"&]/g, '') // 특수 문자 제거
+    .trim()
+}
+
+/**
  * 도서 검색 API
  * 
  * GET /api/search?title=제목&author=저자&publisher=출판사
@@ -54,10 +66,11 @@ export async function GET(request: NextRequest) {
     // 2. 쿼리 파라미터 추출 및 검증
     const { searchParams } = new URL(request.url)
     
+    // 사용자 입력 정제 (XSS 방지)
     const params: SearchParams = {
-      title: searchParams.get('title') || undefined,
-      author: searchParams.get('author') || undefined,
-      publisher: searchParams.get('publisher') || undefined,
+      title: sanitizeServerInput(searchParams.get('title') || '') || undefined,
+      author: sanitizeServerInput(searchParams.get('author') || '') || undefined,
+      publisher: sanitizeServerInput(searchParams.get('publisher') || '') || undefined,
     }
 
     const validation = searchParamsSchema.safeParse(params)

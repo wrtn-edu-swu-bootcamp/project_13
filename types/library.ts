@@ -13,12 +13,22 @@ export interface Library {
   distance?: number
 }
 
-export interface LibraryStatus extends Library {
+export interface LibraryStatus {
+  libraryId: string
+  libraryName: string
+  libraryType: LibraryType
   hasBook: boolean
   isAvailable: boolean
-  status: 'available' | 'on-loan' | 'in-library-only'
+  status: string
   dueDate: string | null
-  location: string
-  callNumber: string
+  location?: string
+  callNumber?: string
   distance?: number
+  // 도서관 기본 정보 (선택사항)
+  address?: string
+  phone?: string
+  hours?: string
+  url?: string
+  lat?: number
+  lng?: number
 }

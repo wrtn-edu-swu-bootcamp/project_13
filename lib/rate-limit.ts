@@ -9,25 +9,27 @@ import { redis } from './cache/redis'
  * Sliding Window:
  * - 시간 창이 매 요청마다 이동하여 더 정확한 제한
  * - Fixed Window보다 버스트 트래픽에 강함
+ * 
+ * Redis가 없으면 null로 설정되어 rate limiting이 비활성화됨
  */
-export const ipRateLimit = new Ratelimit({
+export const ipRateLimit = redis ? new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(10, '1 m'),
   analytics: true, // Upstash Analytics 활성화
   prefix: 'ratelimit:ip',
-})
+}) : null
 
 /**
  * API 키 기반 Rate Limiting (향후 사용)
  * 
  * 설정: 1분에 100회 요청
  */
-export const apiKeyRateLimit = new Ratelimit({
+export const apiKeyRateLimit = redis ? new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(100, '1 m'),
   analytics: true,
   prefix: 'ratelimit:apikey',
-})
+}) : null
 
 /**
  * Rate limit 체크 헬퍼 함수
@@ -38,9 +40,18 @@ export const apiKeyRateLimit = new Ratelimit({
  */
 export async function checkRateLimit(
   identifier: string,
-  limiter: Ratelimit = ipRateLimit
+  limiter: Ratelimit | null = ipRateLimit
 ) {
   try {
+    // Rate limiter가 없으면 (Redis 미설정) 요청 허용
+    if (!limiter) {
+      return {
+        success: true,
+        remaining: 999,
+        reset: new Date(),
+      }
+    }
+    
     const result = await limiter.limit(identifier)
     
     return {

@@ -13,7 +13,7 @@ import { LIBRARIES } from '@/lib/constants/libraries'
 /**
  * 서울시교육청 송파도서관 크롤러
  * 
- * URL: https://songpalib.sen.go.kr
+ * URL: https://splib.sen.go.kr
  * 대상: 송파도서관 1개
  * 
  * ⚠️ 주의: 실제 웹사이트 구조를 확인하고 CSS 셀렉터를 수정해야 합니다.
@@ -33,20 +33,30 @@ export async function scrapeEducationLib(params: SearchParams): Promise<{
   const { title, author, publisher } = params
 
   try {
-    // TODO: 실제 검색 URL 확인 필요
-    // 예상 URL 패턴: https://songpalib.sen.go.kr/search?query={title}
-    const searchUrl = new URL('https://songpalib.sen.go.kr/search')
+    // 실제 검색 URL: https://splib.sen.go.kr/splib/intro/search/index.do
+    const searchUrl = new URL('https://splib.sen.go.kr/splib/intro/search/index.do')
     
-    // 검색 파라미터 추가 (실제 파라미터명 확인 필요)
-    if (title) searchUrl.searchParams.set('query', title)
-    if (author) searchUrl.searchParams.set('author', author)
-    if (publisher) searchUrl.searchParams.set('publisher', publisher)
+    // 필수 파라미터 추가
+    searchUrl.searchParams.set('menu_idx', '4')
+    searchUrl.searchParams.set('locExquery', '111030')
+    searchUrl.searchParams.set('editMode', 'normal')
+    searchUrl.searchParams.set('officeNm', '송파도서관')
+    searchUrl.searchParams.set('mainSearchType', 'on')
+    
+    // 검색어 조합 (제목 + 저자)
+    let searchText = ''
+    if (title) searchText = title
+    if (author) searchText += (searchText ? ' ' : '') + author
+    if (publisher) searchText += (searchText ? ' ' : '') + publisher
+    
+    if (searchText) {
+      searchUrl.searchParams.set('search_text', searchText)
+    }
 
     console.log('Scraping Education Library:', searchUrl.toString())
 
     // HTML 가져오기
-    const response = await fetchWithRetry(searchUrl.toString())
-    const html = await response.text()
+    const html = await fetchWithRetry(searchUrl.toString())
     const $ = cheerio.load(html)
 
     // 도서 기본 정보 추출
@@ -78,20 +88,80 @@ export async function scrapeEducationLib(params: SearchParams): Promise<{
  */
 function extractBookInfo($: cheerio.CheerioAPI): BookInfo | null {
   try {
-    // TODO: 실제 셀렉터 확인 필요
-    // 교육청 도서관 시스템의 실제 HTML 구조에 맞게 수정
-
-    const title = extractText($('.book-title, .title').first())
-    const author = extractText($('.book-author, .author').first())
-    const publisher = extractText($('.book-publisher, .publisher').first())
-    const year = extractText($('.book-year, .pub-year').first())
-    const isbn = extractText($('.book-isbn, .isbn').first())
-    const cover = $('.book-cover, .cover-img').first().attr('src') || ''
-    const description = extractText($('.book-description, .summary').first())
-
+    // 검색 결과에서 첫 번째 도서 항목 찾기
+    // external_links에서 확인한 실제 구조를 반영
+    
+    // 다양한 선택자 시도
+    let title = ''
+    let author = ''
+    let publisher = ''
+    let year = ''
+    let isbn = ''
+    let cover = ''
+    
+    // 전체 페이지 텍스트에서 정보 추출 (가장 유연한 방법)
+    const bodyText = $('body').text()
+    
+    // 도서 제목 추출 - 첫 번째 주요 링크나 제목
+    const titleSelectors = [
+      'h3 a', 'h2 a', '.title a', 'a[href*="detail"]',
+      'td a', 'div[class*="book"] a', 'div[class*="result"] a'
+    ]
+    
+    for (const selector of titleSelectors) {
+      const titleElem = $(selector).first()
+      if (titleElem.length > 0) {
+        title = extractText(titleElem)
+        if (title && title.length > 2) {
+          console.log(`Found title with selector '${selector}': ${title}`)
+          break
+        }
+      }
+    }
+    
+    // 제목을 못 찾았으면 텍스트 패턴으로 시도
     if (!title) {
+      // "도서." 다음에 오는 제목 패턴
+      const titlePattern = bodyText.match(/도서\.\s*([^\n]+?)(?:\s+저자|$)/i)
+      if (titlePattern) {
+        title = titlePattern[1].trim()
+        console.log(`Found title with pattern: ${title}`)
+      }
+    }
+    
+    if (!title) {
+      console.log('No title found, attempting to extract from body text')
+      console.log('First 500 chars:', bodyText.substring(0, 500))
       return null
     }
+    
+    // 저자 추출
+    const authorMatch = bodyText.match(/저자[:\s]*([^발행]+?)(?:\s+발행처|$)/i)
+    if (authorMatch) {
+      author = authorMatch[1].trim()
+    }
+    
+    // 출판사 추출  
+    const publisherMatch = bodyText.match(/발행처[:\s]*([^발행년도]+?)(?:\s+발행년도|$)/i)
+    if (publisherMatch) {
+      publisher = publisherMatch[1].trim()
+    }
+    
+    // 발행연도 추출
+    const yearMatch = bodyText.match(/발행년도[:\s]*(\d{4})/i)
+    if (yearMatch) {
+      year = yearMatch[1]
+    }
+    
+    // ISBN 추출
+    const isbnMatch = bodyText.match(/ISBN[:\s]*([\d\-]+)/i)
+    if (isbnMatch) {
+      isbn = isbnMatch[1].replace(/\-/g, '')
+    }
+    
+    // 책 표지 이미지
+    const coverImg = $('img[src*="cover"], img[src*="book"]').first()
+    cover = coverImg.attr('src') || ''
 
     return {
       title,
@@ -100,7 +170,7 @@ function extractBookInfo($: cheerio.CheerioAPI): BookInfo | null {
       year,
       isbn,
       cover,
-      description,
+      description: '',
     }
   } catch (error) {
     console.error('Error extracting book info from education lib:', error)
@@ -127,32 +197,66 @@ function extractHoldingStatus(
       return []
     }
 
-    // TODO: 실제 셀렉터 확인 필요
-    // 소장 여부 및 대출 상태 확인
-
-    const hasBook = $('.holding-status, .availability').length > 0
-    if (!hasBook) {
-      return []
+    // 전체 페이지 텍스트에서 소장 정보 추출
+    const bodyText = $('body').text()
+    
+    // 청구기호 추출
+    let callNumber = ''
+    const callNumberMatch = bodyText.match(/청구기호[:\s]*([\d\-가-힣a-zA-Z.]+)/i)
+    if (callNumberMatch) {
+      callNumber = callNumberMatch[1].trim()
     }
-
-    const statusText = extractText($('.status-text, .availability-status').first())
-    const location = extractText($('.location, .shelf-location').first())
-    const callNumber = extractText($('.call-number, .classification').first())
-    const dueDateText = extractText($('.due-date, .return-date').first())
+    
+    // 소장 위치 추출 (예: [송파]2층 어문학실)
+    let location = ''
+    const locationMatch = bodyText.match(/도서관[:\s]*송파도서관\s+자료실[:\s]*(\[송파\][^\n]+)/i) ||
+                         bodyText.match(/자료실[:\s]*(\[송파\][^\n]+?)(?:\s+자료상태|$)/i) ||
+                         bodyText.match(/\[송파\][^\n\r]+?(?:실|서고)/i)
+    if (locationMatch) {
+      location = locationMatch[1]?.trim() || locationMatch[0].trim()
+    }
+    
+    // 대출 상태 추출 (예: 대출가능, 대출중)
+    let statusText = ''
+    const statusMatch = bodyText.match(/자료상태[:\s]*([^\n]+?)(?:\n|도서대출|관심도서|$)/i) ||
+                       bodyText.match(/(대출가능|대출중|대출불가|비치중)/i)
+    if (statusMatch) {
+      statusText = statusMatch[1]?.trim() || statusMatch[0].trim()
+    }
+    
+    // 반납 예정일 추출 (대출중인 경우)
+    let dueDateText = ''
+    if (statusText.includes('대출중')) {
+      const dueDateMatch = bodyText.match(/반납예정[:\s]*(\d{4}[-./]\d{2}[-./]\d{2})/i)
+      if (dueDateMatch) {
+        dueDateText = dueDateMatch[1]
+      }
+    }
 
     const status = parseAvailabilityStatus(statusText)
     const isAvailable = status === 'available'
     const dueDate = parseDueDate(dueDateText)
+    const hasBook = true // 검색 결과에 나타났다면 소장 중
+    
+    console.log(`Education lib holding: location='${location}', status='${statusText}', callNumber='${callNumber}'`)
 
     return [
       {
-        ...library,
-        hasBook: true,
+        libraryId: library.id,
+        libraryName: library.name,
+        libraryType: library.type,
+        hasBook,
         isAvailable,
         status,
         dueDate,
         location,
         callNumber,
+        address: library.address,
+        phone: library.phone,
+        hours: library.hours,
+        url: library.url,
+        lat: library.lat,
+        lng: library.lng,
       },
     ]
   } catch (error) {

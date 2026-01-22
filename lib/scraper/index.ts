@@ -68,8 +68,8 @@ function mergeLibraryStatuses(statuses: LibraryStatus[]): LibraryStatus[] {
   const uniqueStatuses = new Map<string, LibraryStatus>()
 
   for (const status of statuses) {
-    if (!uniqueStatuses.has(status.id)) {
-      uniqueStatuses.set(status.id, status)
+    if (!uniqueStatuses.has(status.libraryId)) {
+      uniqueStatuses.set(status.libraryId, status)
     }
   }
 
@@ -86,7 +86,7 @@ function mergeLibraryStatuses(statuses: LibraryStatus[]): LibraryStatus[] {
     }
 
     // 3순위: 도서관 이름 (가나다순)
-    return a.name.localeCompare(b.name, 'ko')
+    return a.libraryName.localeCompare(b.libraryName, 'ko')
   })
 }
 

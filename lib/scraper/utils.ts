@@ -2,60 +2,63 @@
  * 웹 크롤링 유틸리티 함수
  */
 
+import axios, { AxiosRequestConfig } from 'axios'
+
 /**
- * 재시도 로직을 포함한 fetch 함수
+ * 재시도 로직을 포함한 fetch 함수 (axios 사용)
  * 
  * @param url 요청 URL
- * @param options fetch 옵션
+ * @param options axios 요청 옵션
  * @param maxRetries 최대 재시도 횟수 (기본값: 3)
- * @returns Response 객체
+ * @returns HTML 문자열
  */
 export async function fetchWithRetry(
   url: string,
-  options: RequestInit = {},
+  options: AxiosRequestConfig = {},
   maxRetries = 3
-): Promise<Response> {
+): Promise<string> {
   let lastError: Error | null = null
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      // AbortController로 타임아웃 설정 (10초)
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 10000)
-
-      const response = await fetch(url, {
+      const response = await axios({
+        url,
+        method: 'GET',
+        timeout: 10000, // 10초
         ...options,
-        signal: controller.signal,
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; CheokBot/1.0; +https://cheok.vercel.app)',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+          'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+          'Accept-Encoding': 'gzip, deflate, br',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
           ...options.headers,
         },
       })
 
-      clearTimeout(timeoutId)
-
       // 성공적인 응답
-      if (response.ok) {
-        return response
-      }
+      return response.data as string
+    } catch (error: any) {
+      lastError = error
 
       // 429 (Too Many Requests) - 지수 백오프
-      if (response.status === 429) {
+      if (error.response?.status === 429) {
         const delay = Math.pow(2, attempt) * 1000 // 1초, 2초, 4초
         console.warn(`Rate limited (429). Retrying in ${delay}ms...`)
         await sleep(delay)
         continue
       }
 
-      // 기타 HTTP 에러
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-    } catch (error) {
-      lastError = error as Error
+      // HTTP 에러
+      if (error.response) {
+        throw new Error(`HTTP ${error.response.status}: ${error.response.statusText}`)
+      }
 
       // 마지막 시도가 아니면 재시도
       if (attempt < maxRetries - 1) {
         const delay = 1000 * (attempt + 1)
-        console.warn(`Fetch attempt ${attempt + 1} failed. Retrying in ${delay}ms...`)
+        console.warn(`Fetch attempt ${attempt + 1} failed: ${error.message}. Retrying in ${delay}ms...`)
         await sleep(delay)
         continue
       }
