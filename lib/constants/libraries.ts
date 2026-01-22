@@ -292,6 +292,13 @@ export function getLibraryById(id: string): Library | undefined {
 }
 
 /**
+ * 도서관 이름으로 도서관 정보를 찾는 함수
+ */
+export function getLibraryByName(name: string): Library | undefined {
+  return LIBRARIES.find((library) => library.name === name || library.name.includes(name))
+}
+
+/**
  * 도서관 유형별로 필터링하는 함수
  */
 export function getLibrariesByType(type: Library['type']): Library[] {

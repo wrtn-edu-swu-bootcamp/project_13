@@ -1,4 +1,6 @@
 import type { BookResult } from '@/types/search'
+import { getLibraryByName } from '@/lib/constants/libraries'
+import Link from 'next/link'
 
 interface BookResultCardProps {
   result: BookResult
@@ -16,6 +18,9 @@ export function BookResultCard({ result }: BookResultCardProps) {
     statusClass = 'bg-[#FFE8E8] text-[#FF3B30]'
     statusText = '대출 중'
   }
+
+  // 도서관 정보 가져오기
+  const libraryInfo = getLibraryByName(result.library)
 
   return (
     <div className="bg-white rounded-2xl p-8 shadow-md transition-all duration-300 border-2 border-transparent hover:translate-y-[-4px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:border-[#E8F5E9]">
@@ -49,18 +54,46 @@ export function BookResultCard({ result }: BookResultCardProps) {
         </div>
       </div>
       
-      <div className="mt-6 pt-6 border-t border-[#D2D2D7] flex justify-between items-center flex-wrap gap-4">
-        <span className="inline-flex items-center gap-2 px-3 py-2 bg-[#34C759] text-white rounded-lg text-[0.85rem] font-semibold">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-          </svg>
-          {result.library}
-        </span>
-        {result.location && (
-          <span className="text-[0.85rem] text-[#86868B]">
-            {result.location}
-          </span>
+      <div className="mt-6 pt-6 border-t border-[#D2D2D7]">
+        <div className="flex justify-between items-center flex-wrap gap-4 mb-3">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center gap-2 px-3 py-2 bg-[#34C759] text-white rounded-lg text-[0.85rem] font-semibold">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              {result.library}
+            </span>
+            {libraryInfo && (
+              <Link 
+                href={libraryInfo.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#007AFF] text-white rounded-lg text-[0.85rem] font-semibold hover:bg-[#0051D5] transition-colors duration-200"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                도서관 홈페이지
+              </Link>
+            )}
+          </div>
+          {result.location && (
+            <span className="text-[0.85rem] text-[#86868B]">
+              {result.location}
+            </span>
+          )}
+        </div>
+        {libraryInfo && (
+          <div className="flex items-start gap-2 text-[0.8rem] text-[#86868B]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mt-0.5 flex-shrink-0">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span>{libraryInfo.address}</span>
+          </div>
         )}
       </div>
     </div>
