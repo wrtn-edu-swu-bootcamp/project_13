@@ -43,7 +43,7 @@ export function BookSearchForm({ onSearch }: BookSearchFormProps) {
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="제목 (선택)"
+          placeholder="제목"
           className="px-5 py-4 text-base border-2 border-[#D2D2D7] rounded-xl bg-[#F5F5F7] text-[#1D1D1F] placeholder:text-[#86868B] transition-all duration-300 focus:outline-none focus:border-[#34C759] focus:bg-white focus:shadow-[0_0_0_4px_rgba(52,199,89,0.1)]"
           autoComplete="off"
         />
@@ -52,7 +52,7 @@ export function BookSearchForm({ onSearch }: BookSearchFormProps) {
           type="text"
           value={author}
           onChange={(e) => setAuthor(e.target.value)}
-          placeholder="저자 (선택)"
+          placeholder="저자"
           className="px-5 py-4 text-base border-2 border-[#D2D2D7] rounded-xl bg-[#F5F5F7] text-[#1D1D1F] placeholder:text-[#86868B] transition-all duration-300 focus:outline-none focus:border-[#34C759] focus:bg-white focus:shadow-[0_0_0_4px_rgba(52,199,89,0.1)]"
           autoComplete="off"
         />
@@ -61,7 +61,7 @@ export function BookSearchForm({ onSearch }: BookSearchFormProps) {
           type="text"
           value={publisher}
           onChange={(e) => setPublisher(e.target.value)}
-          placeholder="출판사 (선택)"
+          placeholder="출판사"
           className="px-5 py-4 text-base border-2 border-[#D2D2D7] rounded-xl bg-[#F5F5F7] text-[#1D1D1F] placeholder:text-[#86868B] transition-all duration-300 focus:outline-none focus:border-[#34C759] focus:bg-white focus:shadow-[0_0_0_4px_rgba(52,199,89,0.1)]"
           autoComplete="off"
         />

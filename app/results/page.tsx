@@ -153,17 +153,20 @@ function ResultsContent() {
       <div className="container-responsive py-8 md:py-12">
         {/* 헤더 - Apple Style */}
         <header className="mb-10">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-body-sm text-primary hover:text-primary-dark transition-colors mb-6 font-medium"
+          <button
+            onClick={() => router.push('/')}
+            className="inline-flex items-center gap-2 text-body-sm text-primary hover:text-primary-dark transition-colors mb-6 font-medium bg-none border-none cursor-pointer p-0"
           >
             ← 뒤로가기
-          </Link>
-          <Link href="/">
-            <h1 className="text-h1 font-bold text-text-primary tracking-tight hover:text-primary transition-colors cursor-pointer">
+          </button>
+          <button
+            onClick={() => router.push('/')}
+            className="inline-block hover:opacity-75 transition-opacity cursor-pointer bg-none border-none p-0 text-left"
+          >
+            <h1 className="text-h1 font-bold text-text-primary tracking-tight">
               검색 결과
             </h1>
-          </Link>
+          </button>
         </header>
 
         {/* 도서 정보 카드 */}

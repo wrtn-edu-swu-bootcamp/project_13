@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import Link from 'next/link'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Providers } from './providers'
@@ -61,30 +62,32 @@ export default function RootLayout({
         <div className="min-h-screen flex flex-col">
           {/* 그라디언트 헤더 - project13 스타일 */}
           <header className="bg-gradient-to-br from-[#34C759] to-[#30D158] text-white shadow-md">
-            <div className="max-w-[800px] mx-auto px-8 py-12 md:py-16 text-center">
-              <div className="flex items-center justify-center gap-4 mb-2">
-                {/* 책 로고 아이콘 */}
-                <svg 
-                  width="32" 
-                  height="32" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2"
-                  className="text-white"
-                  style={{ color: '#ffffff' }}
-                >
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                </svg>
-                <h1 className="text-[2rem] font-bold tracking-tight text-white" style={{ color: '#ffffff' }}>
-                  송파구 도서관 책크
-                </h1>
+            <Link href="/" className="block hover:opacity-90 transition-opacity no-underline">
+              <div className="max-w-[800px] mx-auto px-8 py-12 md:py-16 text-center cursor-pointer">
+                <div className="flex items-center justify-center gap-4 mb-2">
+                  {/* 책 로고 아이콘 */}
+                  <svg 
+                    width="32" 
+                    height="32" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2"
+                    className="text-white"
+                    style={{ color: '#ffffff' }}
+                  >
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                  </svg>
+                  <h1 className="text-[2rem] font-bold tracking-tight text-white" style={{ color: '#ffffff' }}>
+                    송파구 도서관 책크
+                  </h1>
+                </div>
+                <p className="text-base font-normal text-white/90" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+                  송파구 통합 도서관 · 교육청 송파 도서관
+                </p>
               </div>
-              <p className="text-base font-normal text-white/90" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-                송파구 통합 도서관 · 교육청 송파 도서관
-              </p>
-            </div>
+            </Link>
           </header>
           
           <Providers>{children}</Providers>
