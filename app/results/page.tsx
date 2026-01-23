@@ -159,7 +159,11 @@ function ResultsContent() {
           >
             ← 뒤로가기
           </Link>
-          <h1 className="text-h1 font-bold text-text-primary tracking-tight">검색 결과</h1>
+          <Link href="/">
+            <h1 className="text-h1 font-bold text-text-primary tracking-tight hover:text-primary transition-colors cursor-pointer">
+              검색 결과
+            </h1>
+          </Link>
         </header>
 
         {/* 도서 정보 카드 */}

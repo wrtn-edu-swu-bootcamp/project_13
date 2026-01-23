@@ -150,7 +150,7 @@ export default function HomePage() {
             도서관에서 찾고 싶은 책이 있나요?
           </h3>
           <p className="text-base leading-relaxed">
-            두 도서관을 한 번에 검색하여<br />원하는 책을 빠르게 찾아보세요
+            제목, 저자, 출판사를 검색하여<br />가까운 도서관부터 찾아보세요
           </p>
         </div>
       )}

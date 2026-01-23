@@ -53,7 +53,7 @@ export function BookResultCard({ result }: BookResultCardProps) {
             <img 
               src={result.cover} 
               alt={`${result.title} 표지`}
-              className="w-12 h-16 object-cover rounded-lg shadow-sm"
+              className="w-[120px] h-[180px] object-cover rounded-lg shadow-sm flex-shrink-0"
               onError={(e) => {
                 e.currentTarget.style.display = 'none'
               }}

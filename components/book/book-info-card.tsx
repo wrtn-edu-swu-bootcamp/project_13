@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import type { BookInfo } from '@/types/book'
 
@@ -18,14 +17,11 @@ export function BookInfoCard({ book }: BookInfoCardProps) {
         <div className="flex flex-col md:flex-row gap-6">
           {/* 도서 표지 */}
           {book.cover ? (
-            <div className="flex-shrink-0 mx-auto md:mx-0">
-              <Image
+            <div className="flex-shrink-0 mx-auto md:mx-0 w-[120px] h-[180px]">
+              <img
                 src={book.cover}
                 alt={`${book.title} 표지`}
-                width={120}
-                height={180}
-                className="rounded-xl shadow-sm object-cover"
-                sizes="(max-width: 768px) 120px, 120px"
+                className="w-full h-full rounded-lg shadow-sm object-cover"
                 loading="lazy"
                 onError={(e) => {
                   // 이미지 로딩 실패 시 fallback
@@ -34,8 +30,8 @@ export function BookInfoCard({ book }: BookInfoCardProps) {
               />
             </div>
           ) : (
-            <div className="flex-shrink-0 w-[120px] h-[180px] bg-bg rounded-xl flex items-center justify-center mx-auto md:mx-0">
-              <span className="text-text-tertiary text-5xl">📚</span>
+            <div className="flex-shrink-0 w-[120px] h-[180px] bg-bg rounded-lg flex items-center justify-center mx-auto md:mx-0">
+              <span className="text-text-tertiary text-lg">📚</span>
             </div>
           )}
 

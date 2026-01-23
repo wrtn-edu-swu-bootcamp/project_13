@@ -280,12 +280,14 @@
     }
   }
 
-  /* 커스텀 라디오 버튼 - project13 스타일 */
+  /* 커스텀 라디오 버튼 - project13 스타일 (미니멀) */
   .radio-input {
     appearance: none;
     width: 16px;
     height: 16px;
-    border: 2px solid var(--border-color);
+    min-width: 0;
+    min-height: 0;
+    border: 1px solid var(--border-color);
     border-radius: 50%;
     position: relative;
     cursor: pointer;
