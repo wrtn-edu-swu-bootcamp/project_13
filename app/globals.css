@@ -283,8 +283,8 @@
   /* 커스텀 라디오 버튼 - project13 스타일 */
   .radio-input {
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border: 2px solid var(--border-color);
     border-radius: 50%;
     position: relative;
@@ -303,8 +303,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     background: white;
     border-radius: 50%;
   }

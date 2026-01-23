@@ -24,7 +24,7 @@ export function BookResultCard({ result }: BookResultCardProps) {
 
   return (
     <div className="bg-white rounded-2xl p-8 shadow-md transition-all duration-300 border-2 border-transparent hover:translate-y-[-4px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:border-[#E8F5E9]">
-      <div className="flex justify-between items-start mb-4 gap-6 flex-col md:flex-row">
+      <div className="flex justify-between items-start mb-4 gap-6">
         <div className="flex-1">
           <h3 className="text-xl font-semibold text-[#1D1D1F] mb-2 leading-snug">
             {result.title}
@@ -48,17 +48,29 @@ export function BookResultCard({ result }: BookResultCardProps) {
           </div>
         </div>
         
-        <div className={`px-4 py-2 rounded-xl text-[0.85rem] font-semibold whitespace-nowrap inline-flex items-center gap-2 ${statusClass}`}>
-          <span className={`w-2 h-2 rounded-full ${result.available ? 'bg-[#34C759]' : result.status === '대출중' ? 'bg-[#FF3B30]' : 'bg-[#8E8E93]'}`}></span>
-          {statusText}
+        <div className="flex items-start gap-4">
+          {result.cover && (
+            <img 
+              src={result.cover} 
+              alt={`${result.title} 표지`}
+              className="w-12 h-16 object-cover rounded-lg shadow-sm"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none'
+              }}
+            />
+          )}
+          <div className={`px-4 py-2 rounded-xl text-[0.85rem] font-semibold whitespace-nowrap inline-flex items-center gap-2 ${statusClass}`}>
+            <span className={`w-2 h-2 rounded-full ${result.available ? 'bg-[#34C759]' : result.status === '대출중' ? 'bg-[#FF3B30]' : 'bg-[#8E8E93]'}`}></span>
+            {statusText}
+          </div>
         </div>
       </div>
       
       <div className="mt-6 pt-6 border-t border-[#D2D2D7]">
-        <div className="flex justify-between items-center flex-wrap gap-4 mb-3">
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-2 px-3 py-2 bg-[#34C759] text-white rounded-lg text-[0.85rem] font-semibold">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <div className="flex justify-between items-center flex-wrap gap-3 mb-2">
+          <div className="flex items-center gap-4">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-[#34C759] text-white rounded-lg text-[0.8rem] font-semibold">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
               </svg>
@@ -69,26 +81,26 @@ export function BookResultCard({ result }: BookResultCardProps) {
                 href={libraryInfo.url} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#007AFF] text-white rounded-lg text-[0.85rem] font-semibold hover:bg-[#0051D5] transition-colors duration-200"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[#007AFF] rounded-lg text-[0.8rem] font-semibold hover:text-[#0051D5] transition-colors duration-200"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                   <polyline points="15 3 21 3 21 9"></polyline>
                   <line x1="10" y1="14" x2="21" y2="3"></line>
                 </svg>
-                도서관 홈페이지
+                홈페이지
               </Link>
             )}
           </div>
           {result.location && (
-            <span className="text-[0.85rem] text-[#86868B]">
+            <span className="text-[0.75rem] text-[#86868B]">
               {result.location}
             </span>
           )}
         </div>
         {libraryInfo && (
-          <div className="flex items-start gap-2 text-[0.8rem] text-[#86868B]">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mt-0.5 flex-shrink-0">
+          <div className="flex items-start gap-2 text-[0.75rem] text-[#86868B]">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mt-0.5 flex-shrink-0">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>

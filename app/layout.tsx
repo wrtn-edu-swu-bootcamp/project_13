@@ -76,7 +76,7 @@ export default function RootLayout({
                   <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                   <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                 </svg>
-                <h1 className="text-[2rem] font-bold tracking-tight">송파 도서관 통합 검색</h1>
+                <h1 className="text-[2rem] font-bold tracking-tight text-white">송파 도서관 통합 검색</h1>
               </div>
               <p className="text-base opacity-90 font-normal">송파구통합도서관 · 교육청송파도서관</p>
             </div>

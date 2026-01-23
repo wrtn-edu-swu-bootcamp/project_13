@@ -22,4 +22,5 @@ export interface BookResult {
   available: boolean
   library: string
   location?: string
+  cover?: string // 책 표지 이미지 URL
 }

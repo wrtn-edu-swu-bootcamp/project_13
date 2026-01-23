@@ -52,6 +52,7 @@ export default function HomePage() {
             available: lib.isAvailable,
             library: lib.libraryName,
             location: lib.location || '',
+            cover: data.book.cover || '',
           }))
         
         setResults(bookResults)
